@@ -893,6 +893,25 @@ static void omega_mult(uint8_t * RESTRICT p_result, uint8_t * RESTRICT p_right)
         l_carry = l_sum >> 8;
     }
 }
+#elif uECC_WORD_SIZE == 2
+static void omega_mult(uint16_t * RESTRICT p_result, uint16_t * RESTRICT p_right)
+{
+	uint16_t l_carry;
+	uint16_t i;
+	
+	/* Multiply by (2^31 + 1). */
+	//TODO vli_set(p_result + 1, p_right); /* 2^32 */
+	//TODO vli_rshift1(p_result + 1); /* 2^31 */
+	//TODO p_result[0] = p_right[0] << 31;
+	
+	l_carry = vli_add(p_result, p_result, p_right); /* 2^31 + 1 */
+	for(i = uECC_WORDS; l_carry; ++i)
+	{
+		uint32_t l_sum = (uint32_t)p_result[i] + l_carry;
+		p_result[i] = (uint16_t)l_sum;
+		l_carry = l_sum >> 16;
+	}
+}
 #elif uECC_WORD_SIZE == 4
 static void omega_mult(uint32_t * RESTRICT p_result, uint32_t * RESTRICT p_right)
 {
