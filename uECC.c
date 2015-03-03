@@ -178,7 +178,7 @@ typedef int8_t cmpresult_t;
 
 typedef uint16_t uECC_word_t;
 typedef uint32_t uECC_dword_t;
-typedef uint16_t wordcount_t;
+typedef uint16_t wordcount_t; // TODO unsigned?
 typedef int16_t swordcount_t;
 typedef int32_t bitcount_t;
 typedef int16_t cmpresult_t;
@@ -188,15 +188,15 @@ typedef int16_t cmpresult_t;
 #define uECC_WORD_BITS_SHIFT 4
 #define uECC_WORD_BITS_MASK 0x0f
 
-#define uECC_WORDS_1 // TODO
-#define uECC_WORDS_2 // TODO
-#define uECC_WORDS_3 // TODO
-#define uECC_WORDS_4 // TODO
+#define uECC_WORDS_1 10
+#define uECC_WORDS_2 12
+#define uECC_WORDS_3 16
+#define uECC_WORDS_4 16
 
-#define uECC_N_WORDS_1 // TODO
-#define uECC_N_WORDS_2 // TODO
-#define uECC_N_WORDS_3 // TODO
-#define uECC_N_WORDS_4 // TODO
+#define uECC_N_WORDS_1 12
+#define uECC_N_WORDS_2 12
+#define uECC_N_WORDS_3 16
+#define uECC_N_WORDS_4 16
 
 #define Curve_P_1 {0xFFFF, 0x7FFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF}
 #define Curve_P_2 {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFE, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF}
@@ -894,6 +894,7 @@ static void omega_mult(uint8_t * RESTRICT p_result, uint8_t * RESTRICT p_right)
     }
 }
 #elif uECC_WORD_SIZE == 2
+// TODO
 static void omega_mult(uint16_t * RESTRICT p_result, uint16_t * RESTRICT p_right)
 {
 	uint16_t l_carry;
@@ -1803,6 +1804,19 @@ static void vli_nativeToBytes(uint8_t * RESTRICT p_dest, const uint8_t * RESTRIC
 }
 
 #define vli_bytesToNative(dest, src) vli_nativeToBytes((dest), (src))
+
+#elif uECC_WORD_SIZE == 2
+// TODO: Check
+static void vli_nativeToBytes(uint8_t *p_bytes, const uint16_t *p_native)
+{
+	unsigned i;
+	for(i=0; i<uECC_WORDS; ++i)
+	{
+		uint8_t *p_digit = p_bytes + 2 * (uECC_WORDS - 1 - i);
+		p_digit[0] = p_native[i] >> 8;
+		p_digit[1] = p_native[i];
+	}
+}
 
 #elif uECC_WORD_SIZE == 4
 
