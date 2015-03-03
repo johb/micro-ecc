@@ -178,7 +178,7 @@ typedef int8_t cmpresult_t;
 
 typedef uint16_t uECC_word_t;
 typedef uint32_t uECC_dword_t;
-typedef uint16_t wordcount_t; // TODO unsigned?
+typedef uint16_t wordcount_t; // TODO: unsigned?
 typedef int16_t swordcount_t;
 typedef int32_t bitcount_t;
 typedef int16_t cmpresult_t;
@@ -894,16 +894,18 @@ static void omega_mult(uint8_t * RESTRICT p_result, uint8_t * RESTRICT p_right)
     }
 }
 #elif uECC_WORD_SIZE == 2
-// TODO
+// TODO: not finished
 static void omega_mult(uint16_t * RESTRICT p_result, uint16_t * RESTRICT p_right)
 {
 	uint16_t l_carry;
-	uint16_t i;
+	uint16_t i; // TODO: unsigned?
 	
 	/* Multiply by (2^31 + 1). */
-	//TODO vli_set(p_result + 1, p_right); /* 2^32 */
-	//TODO vli_rshift1(p_result + 1); /* 2^31 */
-	//TODO p_result[0] = p_right[0] << 31;
+	//TODO
+	//vli_set(p_result + 1, p_right); /* 2^32 */
+	//vli_rshift1(p_result + 1); /* 2^31 */
+	//p_result[0] = p_right[0] << 31;
+	
 	
 	l_carry = vli_add(p_result, p_result, p_right); /* 2^31 + 1 */
 	for(i = uECC_WORDS; l_carry; ++i)
@@ -1816,6 +1818,17 @@ static void vli_nativeToBytes(uint8_t *p_bytes, const uint16_t *p_native)
 		p_digit[0] = p_native[i] >> 8;
 		p_digit[1] = p_native[i];
 	}
+}
+
+// TODO: Check
+static void vli_nativeToBytes(uint16_t *p_native, const uint8_t *p_bytes)
+{
+    unsigned i;
+    for(i=0; i<uECC_WORDS; ++i)
+    {
+        const uint8_t *p_digit = p_bytes + 2 * (uECC_WORDS - 1 - i);
+        p_native[i] = ((uint16_t)p_digit[0] << 8) | (uint16_t)p_digit[1];
+    }
 }
 
 #elif uECC_WORD_SIZE == 4
