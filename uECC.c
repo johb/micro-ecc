@@ -15,6 +15,8 @@
         #define uECC_PLATFORM uECC_x86
     #elif defined(__amd64__) || defined(_M_X64)
         #define uECC_PLATFORM uECC_x86_64
+    #elif defined(__msp430__)
+    	#define uECC_PLATFORM uECC_msp430
     #else
         #define uECC_PLATFORM uECC_arch_other
     #endif
@@ -23,6 +25,9 @@
 #ifndef uECC_WORD_SIZE
     #if uECC_PLATFORM == uECC_avr
         #define uECC_WORD_SIZE 1
+    #elif (uECC_PLATFORM == uECC_msp430)
+    	#define uECC_WORD_SIZE 2
+    	#define uECC_CURVE uECC_secp160r1 // By now, only this curve is supported for 16 bit processors.
     #elif (uECC_PLATFORM == uECC_x86_64)
         #define uECC_WORD_SIZE 8
     #else
@@ -174,11 +179,11 @@ typedef int8_t cmpresult_t;
                    0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, \
                    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
 
-#elif (ueCC_WORD_SIZE == 2)
+#elif (uECC_WORD_SIZE == 2)
 
 typedef uint16_t uECC_word_t;
 typedef uint32_t uECC_dword_t;
-typedef uint16_t wordcount_t; //
+typedef uint16_t wordcount_t;
 typedef int16_t swordcount_t;
 typedef int16_t bitcount_t;
 typedef int16_t cmpresult_t;
@@ -919,7 +924,6 @@ static void omega_mult(uint32_t * RESTRICT p_result, uint32_t * RESTRICT p_right
 {
     uint32_t l_carry;
     unsigned i;
-    
     /* Multiply by (2^31 + 1). */
     vli_set(p_result + 1, p_right); /* 2^32 */
     vli_rshift1(p_result + 1); /* 2^31 */
